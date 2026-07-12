@@ -1,6 +1,6 @@
 <div align="center">
 
-[![Grok Register — 注册即入库 CLIProxyAPI](assets/banner.png)](https://github.com/Git-creat7/grokRegister-cpa)
+[![Grok Register — 注册即入库 CLIProxyAPI](assets/banner.png)](https://github.com/huahuazi/grokRegister-cpa)
 
 批量注册 Grok 账号，注册成功后自动把 OAuth 凭证写入 [CLIProxyAPI (CPA)](https://github.com/router-for-me/CLIProxyAPI)：支持本地 auth 目录热加载，也支持 Management API 远程上传。
 
@@ -46,13 +46,21 @@
 ## 安装
 
 ```bash
-git clone https://github.com/Git-creat7/grokRegister-cpa.git
+git clone https://github.com/huahuazi/grokRegister-cpa.git
 cd grokRegister-cpa
+
+# 推荐使用虚拟环境，避免污染全局 Python
+python3 -m venv venv
+source venv/bin/activate  # Windows: venv\Scripts\activate
+
 pip install -r requirements.txt
-cp config.example.json config.json
+cp config.json config.local.json  # 或用 config.example.json
 ```
 
-编辑 `config.json` 后运行。
+> **注意：** `requirements.txt` 中指定了 `DrissionPage==4.1.1.2`，但该版本在 PyPI 不存在。
+> 如果安装报错，请执行 `pip install "DrissionPage>=4.1.1,<4.2"` 自动选择有效的邻近版本。
+
+编辑 `config.json`（或 `config.local.json`）后运行。`config.local.json` 已在 `.gitignore` 中，不会误提交。
 
 ## 配置
 
@@ -221,7 +229,16 @@ python sso_to_auth_json.py --sso-cookie 'eyJ...' \
 python grok_register_ttk.py cli
 ```
 
-提示后输入 `start`。  
+提示后输入 `start`。
+
+> **无图形界面服务器？** 在 Linux 服务器上（无显示器）需要用 `xvfb-run` 包装：
+> ```bash
+> xvfb-run --auto-servernum python3 grok_register_ttk.py cli
+> ```
+> 如果遇到 `Xvfb failed to start`，先执行 `sudo killall Xvfb` 清理残留进程。
+>
+> 脚本已内建 `--no-sandbox` 等 Chrome 参数，无需额外配置。
+
 `Ctrl+C` 一次：当前账号收尾后停止；清理浏览器时不会因二次中断刷 traceback。再按一次强制退出。
 
 ### GUI
@@ -234,12 +251,12 @@ python grok_register_ttk.py
 
 ## 输出文件
 
-| 文件 | 内容 |
-| --- | --- |
-| `accounts_*.txt` | 邮箱、密码、SSO |
-| `mail_credentials.txt` | 临时邮箱凭证 |
+| 文件 | 内容 | 格式 |
+| --- | --- | --- |
+| `accounts_*.txt` | 注册成功的账号信息 | `邮箱----密码----SSO`（每行一个） |
+| `mail_credentials.txt` | 临时邮箱凭证 | `邮箱地址\tJWT令牌` |
 
-均含敏感信息，已在 `.gitignore` 中忽略。`config.json` 也不提交，请用 `config.example.json` 复制。
+均含敏感信息，已在 `.gitignore` 中忽略。
 
 ## 稳定性
 
@@ -271,6 +288,25 @@ CLI 只是不启动 Tk；注册页、Turnstile、SSO 仍依赖真实浏览器。
 **国内服务器调模型超时**  
 入库成功只说明凭证到了 CPA；调用上游 `cli-chat-proxy.grok.com` 还需服务器出网可达（或配置 CPA `proxy-url`）。
 
+**安装依赖时报 `DrissionPage==4.1.1.2` 版本不存在**  
+PyPI 没有这个精确版本。改为宽松安装：
+```bash
+pip install "DrissionPage>=4.1.1,<4.2"
+```
+
+**无显示器的 Linux 服务器运行报错**  
+Chrome 需要虚拟显示器。安装 `xvfb` 后用 `xvfb-run` 启动：
+```bash
+apt install xvfb  # Ubuntu/Debian
+xvfb-run --auto-servernum python3 grok_register_ttk.py cli
+```
+
+**config.json 格式错误导致读成默认配置**  
+JSON 每行末尾都需要逗号（最后一项除外）。检查格式：
+```bash
+python3 -c "import json; json.load(open('config.json')); print('OK')"
+```
+
 ## 目录结构
 
 ```text
@@ -290,4 +326,4 @@ CLI 只是不启动 Tk；注册页、Turnstile、SSO 仍依赖真实浏览器。
 
 ## Acknowledgments
 
-Thanks to [linux.do](https://linux.do) and [CLIProxyAPI](https://github.com/router-for-me/CLIProxyAPI).
+Thanks to [linux.do](https://linux.do), [CLIProxyAPI](https://github.com/router-for-me/CLIProxyAPI) and [Git-creat7](https://github.com/Git-creat7/grokRegister-cpa).
