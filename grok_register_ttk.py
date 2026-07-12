@@ -350,6 +350,9 @@ def add_sso_to_cpa(raw_token, email="", log_callback=None):
 def create_browser_options():
     options = ChromiumOptions()
     options.auto_port()
+    options.set_argument("--no-sandbox")
+    options.set_argument("--disable-dev-shm-usage")
+    options.set_argument("--disable-gpu")
     options.set_timeouts(base=1)
     if os.path.exists(EXTENSION_PATH):
         options.add_extension(EXTENSION_PATH)

@@ -1,33 +1,21 @@
-__pycache__/
-*.pyc
-*.pyo
-*.pyd
-.Python
-.venv/
-venv/
-env/
-
-accounts_*.txt
-mail_credentials.txt
-*.txt
-!requirements.txt
-
+# 配置文件（含敏感信息）
 config.json
 config.local.json
-config.local.*
-*.bak
 
-# 真实账号凭证 / OAuth token 输出，禁止提交
-auth_out.json
-auth_out/
-auth_merged.json
-*.auth.json
-sso_list.txt
-token.json
+# 生成的结果文件
+accounts_*.txt
+mail_credentials.txt
 
-*.log
-.DS_Store
-.idea/
+# Python 虚拟环境
+venv/
+.venv/
+__pycache__/
+*.pyc
+
+# IDE
 .vscode/
-DrissionPage/
-autoPortData/
+.idea/
+
+# OS
+.DS_Store
+Thumbs.db
