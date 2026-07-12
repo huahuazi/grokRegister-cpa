@@ -66,6 +66,9 @@ cp config.example.json config.json
 | `register_count` | 目标注册数量 |
 | `proxy` | 代理；device-flow 换 token 也走此代理 |
 | `enable_nsfw` | 注册后是否尝试开启 NSFW |
+| `yyds_api_key` | YYDS API Key（以 `AC-` 开头） |
+| `yyds_jwt` | YYDS JWT（可选，留空则使用 API Key） |
+| `duckmail_api_key` | DuckMail API Key |
 | `cloudflare_api_base` | Cloudflare 临时邮箱 API 根地址 |
 | `cloudflare_api_key` | 默认匿名模式留空；admin 模式填 `ADMIN_PASSWORD` |
 | `cloudflare_auth_mode` | `none` / `bearer` / `x-api-key` / `x-admin-auth` / `query-key` |
@@ -115,6 +118,44 @@ Worker 若配置了全局 `PASSWORDS`，再加：
 ```json
 { "cloudflare_custom_auth": "你的全局访问密码" }
 ```
+
+### YYDS 邮箱
+
+```json
+{
+  "email_provider": "yyds",
+  "yyds_api_key": "AC-你的APIKey"
+}
+```
+
+> 在 [YYDS Mail](https://vip.215.im) 登录后，到 API Key 管理页面创建 Key（以 `AC-` 开头）。
+
+#### 绑定自己的域名到 YYDS
+
+如果你有自己的域名，可以绑定到 YYDS 用于收信，避免使用公共域名被滥用。
+
+**前置条件：**
+
+- 已在 [YYDS Mail](https://vip.215.im) 注册账号并登录
+- 拥有一个域名，并能修改其 DNS 记录（如 Cloudflare、Namecheap、GoDaddy 等）
+
+**操作步骤：**
+
+1. **登录 YYDS 仪表盘** → 进入「域名管理」页面
+2. **添加域名** — 输入你的域名（例如 `yourdomain.com`）
+3. **获取验证值** — 系统会生成一个唯一的 TXT 记录值
+4. **配置 DNS 记录** — 在你的域名 DNS 管理面板中添加以下记录：
+
+   | 记录类型 | 主机记录 | 记录值 | 说明 |
+   | :--- | :--- | :--- | :--- |
+   | **TXT** | `@` 或 `_yydsmail-verify` | 系统提供的一串验证值 | **必须**：证明域名所有权 |
+   | **MX** | `@` | YYDS 提供的邮件服务器地址 | **必须**：接收邮件 |
+   | **MX** | `*` | YYDS 提供的邮件服务器地址 | **可选**：通配符子域名收信 |
+
+5. **验证域名** — 在 YYDS 仪表盘点击「验证」，系统检测 TXT 记录是否正确
+6. **验证通过后**，你的域名就绑定成功了。以后可以创建 `xxx@yourdomain.com` 的临时邮箱
+
+> **提示：** 如果你的域名托管在 Cloudflare，可以在 YYDS 仪表盘配置 Cloudflare API Token（需要 `Zone:Read` + `DNS:Edit` 权限），实现 DNS 记录自动配置，省去手动添加的步骤。
 
 ## CPA 自动入库
 
